@@ -1,0 +1,13 @@
+{
+  "name": "helloapp",
+  "version": "1.0.0",
+  "scripts": {"start": "nodemon app.js"},
+  "dependencies": {
+    "nodemon": "^3.1.10",
+    "express": "5.1.0",
+    "touch": "3.1.1"
+  },
+  "author":{
+    "name": "Epritskiy Denis"
+  }
+}
