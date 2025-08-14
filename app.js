@@ -8,7 +8,7 @@ app.get("/", function(request,response){
 });
 
 app.get("/static",(request, response)=>{
-    res.json({
+    response.json({
         header: "Hello",
         body : "Octagon NodeJS Test"
     });
@@ -18,12 +18,12 @@ app.get("/dynamic", (request,response)=>{
     const { a, b, c } = request.query;
 
     if(!a || !b || !c || isNaN(a) || isNaN(b) || isNaN(c)){
-        return res.json({header: "Error"})
+        return response.json({header: "Error"})
     }
 
     const result = (parseFloat(a) * parseFloat(b) * parseFloat(c)) / 3
 
-    res.json({
+    response.json({
         header : "Calculated",
         body: result.toString()
     });
