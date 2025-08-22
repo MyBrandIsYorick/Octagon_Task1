@@ -1,8 +1,26 @@
 const express = require("express");
 const mysql = require("mysql2/promise");
-  
+const TelegramBot = require('node-telegram-bot-api');  
 require('dotenv').config();
 
+//Создание бота
+const bot = new TelegramBot(process.env.token, {polling: true});
+
+bot.onText(/\/echo (.+)/, (msg, match) => {
+
+  const chatId = msg.chat.id;
+  const resp = match[1]; 
+
+  bot.sendMessage(chatId, resp);
+});
+
+
+bot.onText(/\/start/, (msg) => {
+  const chatId = msg.chat.id;
+  
+  // Отправляем приветственное сообщение
+  bot.sendMessage(chatId, 'Привет, октагон!');
+});
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
