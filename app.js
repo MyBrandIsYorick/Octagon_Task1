@@ -17,9 +17,47 @@ bot.onText(/\/echo (.+)/, (msg, match) => {
 
 bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
-  
-  // Отправляем приветственное сообщение
-  bot.sendMessage(chatId, 'Привет, октагон!');
+    const welcomeText = `Привет, октагон! 👋
+
+Я бот с полезными командами. Вот что я умею:
+
+/help - показать список команд
+/site - получить ссылку на сайт Октагона
+/creator - узнать создателя бота
+
+Выбери команду или напиши /help для подробностей!`;
+
+  bot.sendMessage(chatId, welcomeText);
+});
+
+bot.onText(/\/help/, (msg) => {
+  const chatId = msg.chat.id;
+  const helpText = `📋 Список доступных команд:
+
+/help - Показать этот список команд с описанием
+/site - Получить ссылку на официальный сайт Октагона
+/creator - Узнать ФИО создателя этого бота
+/start - Начать диалог с ботом заново`;
+
+  bot.sendMessage(chatId, helpText);
+});
+
+bot.onText(/\/site/, (msg) => {
+  const chatId = msg.chat.id;
+  const siteText = `🌐 Официальный сайт Октагона:
+
+https://octagon-students.ru/`;
+
+  bot.sendMessage(chatId, siteText);
+});
+
+bot.onText(/\/creator/, (msg) => {
+  const chatId = msg.chat.id;
+  const creatorText = `👨💻 Создатель этого бота:
+
+Еприцкий Денис Александрович`;
+
+  bot.sendMessage(chatId, creatorText);
 });
 const app = express();
 app.use(express.json());
