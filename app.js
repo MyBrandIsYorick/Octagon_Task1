@@ -1,6 +1,7 @@
 const express = require("express");
 const mysql = require("mysql2/promise");
   
+require('dotenv').config();
 
 const app = express();
 app.use(express.json());
@@ -8,7 +9,7 @@ app.use(express.urlencoded({ extended: true }));
 const pool = mysql.createPool({
   host: 'localhost',
   user: 'root',
-  password: 'Formula1!',
+  password: process.env.DB_password,
   database: 'my_database',
   waitForConnections: true,
   connectionLimit: 10,
