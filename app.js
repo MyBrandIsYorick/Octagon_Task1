@@ -59,6 +59,99 @@ bot.onText(/\/creator/, (msg) => {
 
   bot.sendMessage(chatId, creatorText);
 });
+
+bot.onText(/\/randomItem/, async (msg) => {  
+  try {
+    const [rows] = await pool.query(
+      'SELECT * FROM Items ORDER BY RAND() LIMIT 1'
+    );
+    
+    if (rows.length === 0) {
+      return bot.sendMessage(msg.chat.id, "В базе данных нет предметов 😢");
+    }
+    
+    const randomItem = rows[0];
+    const message = `(${randomItem.id}) - ${randomItem.name}: ${randomItem.desc}`;
+    
+    bot.sendMessage(msg.chat.id, message);
+    
+  } catch (error) {
+    console.error('Ошибка при получении случайного предмета:', error);
+    bot.sendMessage(chatId, "Произошла ошибка при получении случайного предмета 😢");
+  }
+});
+
+bot.onText(/\/deleteItem (.+)/, async (msg, match) => {
+  const chatId = msg.chat.id;
+  const itemId = match[1];
+  
+  if (!itemId || isNaN(itemId)) {
+    return bot.sendMessage(chatId, "❌ Ошибка: Укажите корректный ID предмета\nПример: /deleteItem 5");
+  }
+  
+  try {
+    const [existingItem] = await pool.query(
+      'SELECT * FROM Items WHERE id = ?',
+      [itemId]
+    );
+    
+    if (existingItem.length === 0) {
+      return bot.sendMessage(chatId, "❌ Ошибка: Предмет с таким ID не существует");
+    }
+    
+    await pool.query(
+      'DELETE FROM Items WHERE id = ?',
+      [itemId]
+    );
+    
+    bot.sendMessage(chatId, "✅ Успешно: Предмет удален из базы данных");
+    
+  } catch (error) {
+    console.error('Ошибка при удалении предмета:', error);
+    bot.sendMessage(chatId, "❌ Ошибка: Произошла ошибка при удалении предмета");
+  }
+});
+
+bot.onText(/\/deleteItem$/, (msg) => {
+  const chatId = msg.chat.id;
+  bot.sendMessage(chatId, "ℹ️ Использование: /deleteItem <ID>\nПример: /deleteItem 5");
+});
+
+bot.onText(/\/getItemByID (.+)/, async (msg, match) => {
+  const chatId = msg.chat.id;
+  const itemId = match[1];
+  
+  if (!itemId || isNaN(itemId)) {
+    return bot.sendMessage(chatId, "❌ Ошибка: Укажите корректный ID предмета\nПример: /getItemByID 5");
+  }
+  
+  try {
+
+    const [rows] = await pool.query(
+      'SELECT * FROM Items WHERE id = ?',
+      [itemId]
+    );
+    
+    if (rows.length === 0) {
+      return bot.sendMessage(chatId, "❌ Ошибка: Предмет с таким ID не найден");
+    }
+    
+    const item = rows[0];
+    const message = `(${item.id}) - ${item.name}: ${item.desc}`;
+    
+    bot.sendMessage(chatId, message);
+    
+  } catch (error) {
+    console.error('Ошибка при поиске предмета:', error);
+    bot.sendMessage(chatId, "❌ Ошибка: Произошла ошибка при поиске предмета");
+  }
+});
+
+bot.onText(/\/getItemByID$/, (msg) => {
+  const chatId = msg.chat.id;
+  bot.sendMessage(chatId, "ℹ️ Использование: /getItemByID <ID>\nПример: /getItemByID 5");
+});
+
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -131,6 +224,25 @@ app.get('/getAllItems', async (request, response) => {
   try {
     const [rows] = await pool.query('SELECT * FROM Items');
     response.json(rows);
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.get('/randomItem', async (request, response) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT * FROM Items ORDER BY RAND() LIMIT 1'
+    );
+    
+    if (rows.length === 0) {
+      return response.status(404).json({ error: 'No items found' });
+    }
+    
+    const randomItem = rows[0];
+    response.json(randomItem);
+    
   } catch (error) {
     console.error(error);
     response.status(500).json({ error: 'Internal Server Error' });
